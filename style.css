@@ -1,6 +1,6 @@
 :root {
-  --game-width: 800px;
-  --game-height: 600px
+  --game-width: 700px;
+  --game-height: 500px
 }
 
 
@@ -13,8 +13,17 @@ body {
 }
 
 canvas {
-  margin-top: 50px;
+  /* margin-top: 50px; */
   z-index: 10;
+}
+
+.main-container {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
 .screen-container {
@@ -32,6 +41,17 @@ canvas {
   justify-content: center;
   align-items: center;
   color: whitesmoke;
+}
+
+.screen-translucent {
+  background-color: transparent;
+}
+
+.menu-bar { 
+  display: none;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 10px;
 }
 
 button {

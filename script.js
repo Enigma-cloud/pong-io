@@ -1,13 +1,14 @@
 // Canvas
-const { body } = document;
 const canvas = document.createElement('canvas');
 const context = canvas.getContext('2d');
-const width = 800;
-const height = 600;
+const width = 700;
+const height = 500;
 const screenHeight = window.screen.height;
 const canvasPosition = screenHeight / 2 - height / 2;
-const isMobile = window.matchMedia('(max-width: 800px)');
+const isMobile = window.matchMedia('(max-width: 700px)');
+const mainContainer = document.getElementById('main-container');
 const gameOverEl = document.createElement('div');
+const startScreenEl = document.getElementById('start-screen');
 
 // Paddle
 const paddleHeight = 50;
@@ -31,11 +32,11 @@ let computerSpeed;
 
 // Change Mobile Settings
 if (isMobile.matches) {
-  speedY = -2;
+  speedY = -1;
   speedX = speedY;
   computerSpeed = 4;
 } else {
-  speedY = -1;
+  speedY = -2;
   speedX = speedY;
   computerSpeed = 3;
 }
@@ -43,7 +44,7 @@ if (isMobile.matches) {
 // Score
 let playerScore = 0;
 let computerScore = 0;
-const winningScore = 10;
+const winningScore = 5;
 let isGameOver = true;
 let isNewGame = true;
 
@@ -87,7 +88,7 @@ function renderCanvas() {
 function createCanvas() {
   canvas.width = width;
   canvas.height = height;
-  body.appendChild(canvas);
+  mainContainer.appendChild(canvas);
   renderCanvas();
 }
 
@@ -95,7 +96,7 @@ function createCanvas() {
 function ballReset() {
   ballX = width / 2;
   ballY = height / 2;
-  speedY = -3;
+  speedX = (-speedX) / 1.5;
   paddleContact = false;
 }
 
@@ -139,6 +140,7 @@ function ballBoundaries() {
       // Reset Ball, add to Computer Score
       ballReset();
       computerScore++;
+      
     }
   }
   // Bounce off computer paddle (Right)
@@ -157,6 +159,7 @@ function ballBoundaries() {
       // Reset Ball, add to Player Score
       ballReset();
       playerScore++;
+      
     }
   }
 }
@@ -177,17 +180,23 @@ function showGameOverEl(winner) {
   canvas.hidden = true;
   // Container
   gameOverEl.textContent = '';
+  // gameOverEl.classList.add('screen-translucent');
   gameOverEl.classList.add('screen-container');
   // Title
   const title = document.createElement('h1');
+  const scoreBoard = document.createElement('h2');
   title.textContent = `${winner} Wins!`;
+  scoreBoard.textContent = `${computerScore} : ${playerScore}`
   // Button
   const playAgainBtn = document.createElement('button');
+  const backToMenuBtn = document.createElement('button');
+
   playAgainBtn.setAttribute('onclick', 'startGame()');
   playAgainBtn.textContent = 'Play Again';
+  backToMenuBtn.textContent = 'Back to Menu'
   // Append
-  gameOverEl.append(title, playAgainBtn);
-  body.appendChild(gameOverEl);
+  gameOverEl.append(title, scoreBoard, playAgainBtn, backToMenuBtn);
+  mainContainer.appendChild(gameOverEl);
   
 }
 
@@ -216,7 +225,7 @@ function animate() {
 // Start Game, Reset Everything
 function startGame() {
   if (isGameOver && !isNewGame) {
-    body.removeChild(gameOverEl);
+    mainContainer.removeChild(gameOverEl);
     canvas.hidden = false;
   }
   isGameOver = false;
@@ -230,7 +239,6 @@ function startGame() {
     playerMoved = true;
     // Compensate for canvas being centered
     paddleRightY = e.clientY - canvasPosition + (4 * paddleDiff);
-    console.log(paddleRightY)
     if (paddleRightY < 0) {
       paddleRightY = 0;
     }
@@ -242,9 +250,25 @@ function startGame() {
   });
 }
 
-function showStartScreen() {
-  
+function toggleStartScreen() {
+  if (!canvas.hidden) {
+    canvas.hidden = true;
+    startScreenEl.hidden = false;
+    return
+  }
+  canvas.hidden = false;
+  startScreenEl.hidden = true;
 }
 
+// Event Listeners
+const menuBar = document.getElementById('menu');
+const startGameBtn = document.getElementById('start-game');
+
+startGameBtn.addEventListener('click', () => {
+  startScreenEl.style.display = 'none';
+  menuBar.style.display = 'flex';
+  startGame();
+});
+
 // On Load
-startGame();
+// startGame();
