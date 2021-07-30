@@ -14,8 +14,14 @@ body {
 
 canvas {
   /* margin-top: 50px; */
-  z-index: 10;
+  z-index: 9;
 }
+
+h1 {
+  margin: 0;
+  padding: 0;
+}
+
 
 .main-container {
   margin: 0;
@@ -24,6 +30,10 @@ canvas {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+}
+
+.screen-title {
+  margin: 10px;
 }
 
 .screen-container {
@@ -43,15 +53,79 @@ canvas {
   color: whitesmoke;
 }
 
-.screen-translucent {
-  background-color: transparent;
+.screen-container h2 {
+  font-weight: bold;
 }
 
 .menu-bar { 
+  z-index: 11;
+  width: 100%;
   display: none;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 10px 0px 10px 0px;
+  background-color: rgb(56, 56, 56);
+  border-radius: 3px 3px 0px 0px;
+}
+
+.menu-bar h1 {
+  color: whitesmoke;
+  padding-left: 10px;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-right: 10px;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.4);
+
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  animation: modalopen 0.4s;
+}
+
+@keyframes modalopen {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  display: flex;
+  justify-content: center;
+  width: 400px;
+  height: 200px;
+  background-color: rgba(56, 56, 56);
+  margin: auto;
+  padding: 20px;
+  width: 30%;
+}
+
+/* Icons */
+.fas {
+  color: whitesmoke;
+  font-size: 25px;
+  transition: 0.2s ease-in;
+}
+
+.fas:hover {
+  filter: brightness(90%);
+  transform: rotate(45deg);
 }
 
 button {
@@ -94,13 +168,13 @@ button:focus {
 /* Large Smartphone (Vertical) */
 @media screen and (max-width: 500px) {
   canvas {
-    width: 100%;
-    height: 700px;
+    width: 700px;
+    height: 100%;
     margin-top: 50px;
   }
 
   .screen-container  {
-    width: 100%;
-    height: 700px;
+    width: 700px;
+    height: 100%;
   }
 }

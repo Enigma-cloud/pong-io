@@ -6,9 +6,11 @@ const height = 500;
 const screenHeight = window.screen.height;
 const canvasPosition = screenHeight / 2 - height / 2;
 const isMobile = window.matchMedia('(max-width: 700px)');
-const mainContainer = document.getElementById('main-container');
+const gameContainer = document.getElementById('game-container');
 const gameOverEl = document.createElement('div');
 const startScreenEl = document.getElementById('start-screen');
+const startGameBtn = document.getElementById('start-game');
+const menuBar = document.getElementById('menu');
 
 // Paddle
 const paddleHeight = 50;
@@ -44,7 +46,7 @@ if (isMobile.matches) {
 // Score
 let playerScore = 0;
 let computerScore = 0;
-const winningScore = 5;
+const winningScore = 1;
 let isGameOver = true;
 let isNewGame = true;
 
@@ -79,7 +81,7 @@ function renderCanvas() {
   context.fill();
 
   // Score
-  context.font = '32px Courier New';
+  context.font = 'bold 32px Courier New';
   context.fillText(playerScore, (canvas.width / 2) + 40, 40);
   context.fillText(computerScore, (canvas.width / 2) - 60, 40);
 }
@@ -88,7 +90,7 @@ function renderCanvas() {
 function createCanvas() {
   canvas.width = width;
   canvas.height = height;
-  mainContainer.appendChild(canvas);
+  gameContainer.appendChild(canvas);
   renderCanvas();
 }
 
@@ -193,10 +195,11 @@ function showGameOverEl(winner) {
 
   playAgainBtn.setAttribute('onclick', 'startGame()');
   playAgainBtn.textContent = 'Play Again';
+  backToMenuBtn.setAttribute('onclick', 'showStartScreen()')
   backToMenuBtn.textContent = 'Back to Menu'
   // Append
   gameOverEl.append(title, scoreBoard, playAgainBtn, backToMenuBtn);
-  mainContainer.appendChild(gameOverEl);
+  gameContainer.appendChild(gameOverEl);
   
 }
 
@@ -217,28 +220,42 @@ function animate() {
   ballBoundaries();
   computerAI();
   gameOver();
-  if (!isGameOver) {
+  if (!isGameOver && !isPaused) {
     window.requestAnimationFrame(animate);
   } 
 }
 
-// Start Game, Reset Everything
-function startGame() {
-  if (isGameOver && !isNewGame) {
-    mainContainer.removeChild(gameOverEl);
-    canvas.hidden = false;
-  }
+let isPaused = false;
+
+// Reset variables
+function resetGame() {
   isGameOver = false;
   isNewGame = false;
+  isPaused = false;
   playerScore = 0;
   computerScore = 0;
+  // Reset Modal
+  settingsModal.style.display = 'none';
+}
+
+// Start Game, Reset Everything
+function startGame() {
+  startScreenEl.style.display = 'none';
+  menuBar.style.display = 'flex';
+
+  if (isGameOver && !isNewGame) {
+    canvas.hidden = false;
+    gameContainer.removeChild(gameOverEl);
+  }
+  resetGame();
   ballReset();
   createCanvas();
   animate();
+
   canvas.addEventListener('mousemove', (e) => {
     playerMoved = true;
     // Compensate for canvas being centered
-    paddleRightY = e.clientY - canvasPosition + (4 * paddleDiff);
+    paddleRightY = e.clientY - canvasPosition - paddleDiff;
     if (paddleRightY < 0) {
       paddleRightY = 0;
     }
@@ -250,25 +267,39 @@ function startGame() {
   });
 }
 
-function toggleStartScreen() {
-  if (!canvas.hidden) {
-    canvas.hidden = true;
-    startScreenEl.hidden = false;
-    return
+function showStartScreen() {
+  if (confirm('Go back to start menu?')) {
+    gameContainer.removeChild(canvas);
+    gameContainer.removeChild(gameOverEl);
   }
-  canvas.hidden = false;
-  startScreenEl.hidden = true;
+  menuBar.style.display = 'none';
+  startScreenEl.style.display = 'flex';
+}
+
+function openSettings() {
+  if (settingsModal.style.display !== 'none') {
+    settingsModal.style.display = 'none';
+  }
+  else {
+    settingsModal.style.display = 'flex';
+  console.log(settingsModal.style.display);
+  }
+  isPaused = !isPaused;
+  return animate();
 }
 
 // Event Listeners
-const menuBar = document.getElementById('menu');
-const startGameBtn = document.getElementById('start-game');
+const settingsModal = document.getElementById('settings-modal');
+const settingsBtn = document.getElementById('settings-btn');
 
-startGameBtn.addEventListener('click', () => {
-  startScreenEl.style.display = 'none';
-  menuBar.style.display = 'flex';
-  startGame();
-});
+settingsBtn.addEventListener('click', openSettings);
+
+startGameBtn.addEventListener('click', startGame);
+window.addEventListener('click', (e) => {
+  if (e.target === settingsModal) {
+    openSettings();
+  }
+})
 
 // On Load
 // startGame();

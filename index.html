@@ -5,20 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pong</title>
     <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.min.css"/>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="main-container" id="main-container">
         <div class="menu-bar" id="menu">
-            <button>Hello There</button>
+            <h1>Pong</h1>
+            <div class="btn-container">            
+                <i class="fas fa-cog" id="settings-btn" title="Settings"></i>
+            </div>
         </div>
         <div class="screen-container" id="start-screen">
-            <h1>Pong</h1>
-            <button id="select-game-mode">Mode</button>
+            <h1 class="screen-title">Pong</h1>
+            <!-- <button id="select-game-mode">Mode</button> -->
             <button id="start-game">Start</button>
+        </div>
+        <div class="game-container" id="game-container">
+            <div class="modal" id="settings-modal">
+                <div class="modal-content">
+                    <!-- <span>Difficulty:</span>
+                    <button>TESTING</button>
+                    <label for="ball-color">Ball color:</label>
+                    <input class="jscolor" id="ball-color" value="4CFFA4"> -->
+                </div>
+            </div>
         </div>
     </div>
     <!-- Script -->
+    <script src="jscolor.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
