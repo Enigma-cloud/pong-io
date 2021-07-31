@@ -114,11 +114,11 @@ function ballMove() {
 
 // Determine What Ball Bounces Off, Score Points, Reset Ball
 function ballBoundaries() {
-  // Bounce off Bottom
+  // Bounce off bottom
   if (ballY > height && speedY > 0) {
     speedY = -speedY;
   }
-  // Bounce off Ceiling 
+  // Bounce off ceiling 
   if (ballY < 0 && speedY < 0) {
     speedY = -speedY;
   }
@@ -241,12 +241,10 @@ function resetGame() {
 // Start Game, Reset Everything
 function startGame() {
   startScreenEl.style.display = 'none';
+  gameContainer.contains(gameOverEl) ? gameContainer.removeChild(gameOverEl) : '';
   menuBar.style.display = 'flex';
+  canvas.hidden = false;
 
-  if (isGameOver && !isNewGame) {
-    canvas.hidden = false;
-    gameContainer.removeChild(gameOverEl);
-  }
   resetGame();
   ballReset();
   createCanvas();
@@ -267,6 +265,7 @@ function startGame() {
   });
 }
 
+// Go back to start screen
 function showStartScreen() {
   if (confirm('Go back to start menu?')) {
     gameContainer.removeChild(canvas);

@@ -110,7 +110,7 @@ h1 {
   justify-content: center;
   width: 400px;
   height: 200px;
-  background-color: rgba(56, 56, 56);
+  background-color: rgba(56, 56, 56, 0.5);
   margin: auto;
   padding: 20px;
   width: 30%;
