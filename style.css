@@ -22,6 +22,11 @@ h1 {
   padding: 0;
 }
 
+input {
+  width: 100px;
+  height: 20px;
+  border-radius: 3px;
+}
 
 .main-container {
   margin: 0;
@@ -108,12 +113,40 @@ h1 {
 .modal-content {
   display: flex;
   justify-content: center;
-  width: 400px;
-  height: 200px;
-  background-color: rgba(56, 56, 56, 0.5);
+  align-items: center;
+  flex-direction: column;
+  width: 300px;
+  height: fit-content;
+  background-color: rgba(56, 56, 56, 1);
+  border-radius: 5px;
   margin: auto;
-  padding: 20px;
-  width: 30%;
+  padding: 0;
+  overflow: hidden;
+}
+
+.content-header {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(100, 100, 100);
+  color: whitesmoke;
+  font-size: 13px;
+  padding: 5px 0px 5px 0px;
+}
+
+.content-header h1 {
+  display: flex;
+  align-items: center;
+}
+
+.content-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 10px;
+  color: whitesmoke;
 }
 
 /* Icons */
@@ -126,6 +159,7 @@ h1 {
 .fas:hover {
   filter: brightness(90%);
   transform: rotate(45deg);
+  cursor: pointer;
 }
 
 button {

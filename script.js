@@ -11,6 +11,7 @@ const gameOverEl = document.createElement('div');
 const startScreenEl = document.getElementById('start-screen');
 const startGameBtn = document.getElementById('start-game');
 const menuBar = document.getElementById('menu');
+const ballColorBtn = document.getElementById('ball-color');
 
 // Paddle
 const paddleHeight = 50;
@@ -34,7 +35,7 @@ let computerSpeed;
 
 // Change Mobile Settings
 if (isMobile.matches) {
-  speedY = -1;
+  speedY = -2;
   speedX = speedY;
   computerSpeed = 4;
 } else {
@@ -46,7 +47,7 @@ if (isMobile.matches) {
 // Score
 let playerScore = 0;
 let computerScore = 0;
-const winningScore = 1;
+const winningScore = 10000;
 let isGameOver = true;
 let isNewGame = true;
 
@@ -77,11 +78,12 @@ function renderCanvas() {
   // Ball
   context.beginPath();
   context.arc(ballX, ballY, ballRadius, 2 * Math.PI, false);
-  context.fillStyle = 'white';
+  context.fillStyle = `#${ballColorBtn.value}`;
   context.fill();
 
   // Score
   context.font = 'bold 32px Courier New';
+  context.fillStyle = `white`;
   context.fillText(playerScore, (canvas.width / 2) + 40, 40);
   context.fillText(computerScore, (canvas.width / 2) - 60, 40);
 }
@@ -96,9 +98,9 @@ function createCanvas() {
 
 // Reset Ball to Center
 function ballReset() {
+  speedX = (-speedX) / 1.5;
   ballX = width / 2;
   ballY = height / 2;
-  speedX = (-speedX) / 1.5;
   paddleContact = false;
 }
 
@@ -110,6 +112,7 @@ function ballMove() {
   if (playerMoved && paddleContact) {
     ballY += speedY;
   }
+  console.log(speedX);
 }
 
 // Determine What Ball Bounces Off, Score Points, Reset Ball
@@ -291,8 +294,8 @@ function openSettings() {
 const settingsModal = document.getElementById('settings-modal');
 const settingsBtn = document.getElementById('settings-btn');
 
+ballColorBtn.addEventListener('change', createCanvas);
 settingsBtn.addEventListener('click', openSettings);
-
 startGameBtn.addEventListener('click', startGame);
 window.addEventListener('click', (e) => {
   if (e.target === settingsModal) {
