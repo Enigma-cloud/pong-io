@@ -102,6 +102,7 @@ let isGameOver = true;
 let isNewGame = true;
 // Game Mode
 let isMultiplayer = false;
+let restrictMouse = false;
 
 
 /** Functions */
@@ -225,6 +226,8 @@ function ballBoundaries() {
 // Toggle Game Mode
 function toggleMode() {
   isMultiplayer = !isMultiplayer;
+  restrictMouse = !restrictMouse;
+  console.log(restrictMouse);
   modeTitle.textContent = `Mode: ${isMultiplayer ? 'Multiplayer' : 'Single Player'}`;
 }
 
@@ -233,6 +236,20 @@ function executeMoves() {
   Object.keys(controller).forEach(key => {
     controller[key].pressed && controller[key].func();
   })
+}
+
+function mouseMovement(e) {
+  playerMoved = true;
+  // Compensate for canvas being centered
+  paddleRightY = e.clientY - canvasPosition - paddleDiff;
+  if (paddleRightY < 0) {
+    paddleRightY = 0;
+  }
+  if (paddleRightY > height - paddleHeight) {
+    paddleRightY = height - paddleHeight;
+  }
+  // Hide Cursor
+  canvas.style.cursor = 'none';
 }
 
 // Single Player - Computer Movement
@@ -371,22 +388,14 @@ function startGame() {
         controller[e.key].pressed = false;
       }
     });
+    // Remove Mouse Movement
+    if (restrictMouse) {
+      canvas.removeEventListener('mousemove', (e) => mouseMovement(e));
+    }
   }
   else {
     // Single Player - Mouse Movement
-    canvas.addEventListener('mousemove', (e) => {
-      playerMoved = true;
-      // Compensate for canvas being centered
-      paddleRightY = e.clientY - canvasPosition - paddleDiff;
-      if (paddleRightY < 0) {
-        paddleRightY = 0;
-      }
-      if (paddleRightY > height - paddleHeight) {
-        paddleRightY = height - paddleHeight;
-      }
-      // Hide Cursor
-      canvas.style.cursor = 'none';
-    });
+    canvas.addEventListener('mousemove', (e) => mouseMovement(e));
   }
 }
 
