@@ -1,18 +1,26 @@
 // Canvas
 const canvas = document.createElement('canvas');
 const context = canvas.getContext('2d');
-const width = 700;
-const height = 500;
+const width = 800;
+const height = 600;
 const screenHeight = window.screen.height;
 const canvasPosition = screenHeight / 2 - height / 2;
 const isMobile = window.matchMedia('(max-width: 700px)');
-const gameContainer = document.getElementById('game-container');
-const gameOverEl = document.createElement('div');
+// Screens
 const startScreenEl = document.getElementById('start-screen');
 const startGameBtn = document.getElementById('start-game');
+const modeBtn = document.getElementById('select-game-mode');
+const modeTitle = document.getElementById('mode-title');
+const gameContainer = document.getElementById('game-container');
+const gameOverEl = document.createElement('div');
+// Menu
 const menuBar = document.getElementById('menu');
+const settingsModal = document.getElementById('settings-modal');
+const settingsBtn = document.getElementById('settings-btn');
 const ballColorBtn = document.getElementById('ball-color');
+const modalBackToMenu = document.getElementById('modal-back-to-menu');
 
+/** Constants & Variables */
 // Paddle
 const paddleHeight = 50;
 const paddleWidth = 10;
@@ -21,6 +29,46 @@ let paddleRightY = (height/2) - paddleDiff;
 let paddleLeftY = 225;
 let playerMoved = false;
 let paddleContact = false;
+
+// Multiplayer - Movement Controller
+const controller = {
+  "s": {pressed: false,
+      func: () => {
+        playerMoved = true;
+        paddleLeftY += 5;
+        if (paddleLeftY > height - paddleHeight) {
+          paddleLeftY = height - paddleHeight;
+        }
+      }
+    },
+  "w": {pressed: false,
+      func: () => {
+        playerMoved = true;
+        paddleLeftY -= 5;
+        if (paddleLeftY < 0) {
+          paddleLeftY = 0;
+        }
+      }
+     },
+  "ArrowDown": {pressed: false,
+      func: () => {
+        playerMoved = true;
+        paddleRightY += 5;
+        if (paddleRightY > height - paddleHeight) {
+          paddleRightY = height - paddleHeight;
+      }
+    }
+  },
+  "ArrowUp": {pressed: false,
+      func: () => {
+        playerMoved = true;
+        paddleRightY -= 5;
+        if (paddleRightY < 0) {
+          paddleRightY = 0;
+      }
+    }
+  }
+}
 
 // Ball
 let ballX = width/2;
@@ -35,22 +83,28 @@ let computerSpeed;
 
 // Change Mobile Settings
 if (isMobile.matches) {
+  // Temporary Log
+  console.log(isMobile.matches);
   speedY = -2;
   speedX = speedY;
   computerSpeed = 4;
 } else {
-  speedY = -2;
+  speedY = -4;
   speedX = speedY;
   computerSpeed = 3;
 }
 
 // Score
-let playerScore = 0;
-let computerScore = 0;
-const winningScore = 10000;
+let playerTwo = 0;
+let playerOne = 0;
+const winningScore = 1;
 let isGameOver = true;
 let isNewGame = true;
+// Game Mode
+let isMultiplayer = false;
 
+
+/** Functions */
 // Render Everything on Canvas
 function renderCanvas() {
   // Canvas Background
@@ -84,8 +138,8 @@ function renderCanvas() {
   // Score
   context.font = 'bold 32px Courier New';
   context.fillStyle = `white`;
-  context.fillText(playerScore, (canvas.width / 2) + 40, 40);
-  context.fillText(computerScore, (canvas.width / 2) - 60, 40);
+  context.fillText(playerTwo, (canvas.width / 2) + 40, 40);
+  context.fillText(playerOne, (canvas.width / 2) - 60, 40);
 }
 
 // Create Canvas Element
@@ -112,7 +166,6 @@ function ballMove() {
   if (playerMoved && paddleContact) {
     ballY += speedY;
   }
-  console.log(speedX);
 }
 
 // Determine What Ball Bounces Off, Score Points, Reset Ball
@@ -142,9 +195,9 @@ function ballBoundaries() {
       trajectoryY = ballY - (paddleRightY + paddleDiff);
       speedY = trajectoryY * 0.3;
     } else if (ballX > width) {
-      // Reset Ball, add to Computer Score
+      // Reset Ball, add to Player One score
       ballReset();
-      computerScore++;
+      playerOne++;
       
     }
   }
@@ -161,15 +214,28 @@ function ballBoundaries() {
       }
       speedX = -speedX;
     } else if (ballX < 0) {
-      // Reset Ball, add to Player Score
+      // Reset Ball, add to Player Two score
       ballReset();
-      playerScore++;
+      playerTwo++;
       
     }
   }
 }
 
-// Computer Movement
+// Toggle Game Mode
+function toggleMode() {
+  isMultiplayer = !isMultiplayer;
+  modeTitle.textContent = `Mode: ${isMultiplayer ? 'Multiplayer' : 'Single Player'}`;
+}
+
+// Multiplayer - Execute Paddle Movement 
+function executeMoves() {
+  Object.keys(controller).forEach(key => {
+    controller[key].pressed && controller[key].func();
+  })
+}
+
+// Single Player - Computer Movement
 function computerAI() {
   if (playerMoved) {
     if (paddleLeftY + paddleDiff < ballY) {
@@ -180,6 +246,30 @@ function computerAI() {
   }
 }
 
+// Go back to start screen
+function showStartScreen() {
+  if (!confirm('Go back to start menu?')) {
+    return
+  }
+  gameContainer.removeChild(canvas);
+  gameContainer.contains(gameOverEl) ? gameContainer.removeChild(gameOverEl) : '';
+  menuBar.style.display = 'none';
+  startScreenEl.style.display = 'flex';
+}
+
+// Open Settings Modal
+function toggleSettings() {
+  if (settingsModal.style.display !== 'none') {
+    settingsModal.style.display = 'none';
+  }
+  else {
+    settingsModal.style.display = 'flex';
+  }
+  isPaused = !isPaused;
+  return animate();
+}
+
+// Game Over Screen
 function showGameOverEl(winner) {
   // Hide Canvas
   canvas.hidden = true;
@@ -191,7 +281,7 @@ function showGameOverEl(winner) {
   const title = document.createElement('h1');
   const scoreBoard = document.createElement('h2');
   title.textContent = `${winner} Wins!`;
-  scoreBoard.textContent = `${computerScore} : ${playerScore}`
+  scoreBoard.textContent = `${playerOne} : ${playerTwo}`
   // Button
   const playAgainBtn = document.createElement('button');
   const backToMenuBtn = document.createElement('button');
@@ -208,10 +298,17 @@ function showGameOverEl(winner) {
 
 // Check If One Player Has Winning Score, If They Do, End Game
 function gameOver() {
-  if (playerScore === winningScore || computerScore === winningScore) {
+  if (playerTwo === winningScore || playerOne === winningScore) {
     isGameOver = true;
+
+    if (isMultiplayer) {
+      playerOneName = 'Player 1';
+    }
+    else {
+      playerOneName = 'Computer';
+    }
     // Set Winner
-    const winner = playerScore === winningScore ? 'Player' : 'Computer';
+    const winner = playerTwo === winningScore ? 'Player 2' : playerOneName;
     showGameOverEl(winner);
   }
 }
@@ -221,7 +318,14 @@ function animate() {
   renderCanvas();
   ballMove();
   ballBoundaries();
-  computerAI();
+
+  if (isMultiplayer) {
+    executeMoves();
+  }
+  else {
+    computerAI();
+  }
+
   gameOver();
   if (!isGameOver && !isPaused) {
     window.requestAnimationFrame(animate);
@@ -234,9 +338,10 @@ let isPaused = false;
 function resetGame() {
   isGameOver = false;
   isNewGame = false;
+
   isPaused = false;
-  playerScore = 0;
-  computerScore = 0;
+  playerTwo = 0;
+  playerOne = 0;
   // Reset Modal
   settingsModal.style.display = 'none';
 }
@@ -253,55 +358,46 @@ function startGame() {
   createCanvas();
   animate();
 
-  canvas.addEventListener('mousemove', (e) => {
-    playerMoved = true;
-    // Compensate for canvas being centered
-    paddleRightY = e.clientY - canvasPosition - paddleDiff;
-    if (paddleRightY < 0) {
-      paddleRightY = 0;
-    }
-    if (paddleRightY > height - paddleHeight) {
-      paddleRightY = height - paddleHeight;
-    }
-    // Hide Cursor
-    canvas.style.cursor = 'none';
-  });
-}
-
-// Go back to start screen
-function showStartScreen() {
-  if (confirm('Go back to start menu?')) {
-    gameContainer.removeChild(canvas);
-    gameContainer.removeChild(gameOverEl);
-  }
-  menuBar.style.display = 'none';
-  startScreenEl.style.display = 'flex';
-}
-
-function openSettings() {
-  if (settingsModal.style.display !== 'none') {
-    settingsModal.style.display = 'none';
+  if (isMultiplayer) {
+    // Multiplayer - Movement Handlers
+    document.addEventListener('keydown', (e) => {
+      playerMoved = true;
+      if (controller[e.key]) {
+        controller[e.key].pressed = true;
+      }
+    });
+    document.addEventListener('keyup', (e) => {
+      if (controller[e.key]) {
+        controller[e.key].pressed = false;
+      }
+    });
   }
   else {
-    settingsModal.style.display = 'flex';
-  console.log(settingsModal.style.display);
+    // Single Player - Mouse Movement
+    canvas.addEventListener('mousemove', (e) => {
+      playerMoved = true;
+      // Compensate for canvas being centered
+      paddleRightY = e.clientY - canvasPosition - paddleDiff;
+      if (paddleRightY < 0) {
+        paddleRightY = 0;
+      }
+      if (paddleRightY > height - paddleHeight) {
+        paddleRightY = height - paddleHeight;
+      }
+      // Hide Cursor
+      canvas.style.cursor = 'none';
+    });
   }
-  isPaused = !isPaused;
-  return animate();
 }
 
-// Event Listeners
-const settingsModal = document.getElementById('settings-modal');
-const settingsBtn = document.getElementById('settings-btn');
 
+/** On-load Event Listeners */
+modalBackToMenu.addEventListener('click', showStartScreen);
 ballColorBtn.addEventListener('change', createCanvas);
-settingsBtn.addEventListener('click', openSettings);
+settingsBtn.addEventListener('click', toggleSettings);
 startGameBtn.addEventListener('click', startGame);
 window.addEventListener('click', (e) => {
   if (e.target === settingsModal) {
-    openSettings();
+    toggleSettings();
   }
 })
-
-// On Load
-// startGame();

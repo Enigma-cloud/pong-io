@@ -18,8 +18,9 @@
         </div>
         <div class="screen-container" id="start-screen">
             <h1 class="screen-title">Pong</h1>
-            <!-- <button id="select-game-mode">Mode</button> -->
-            <button id="start-game">Start</button>
+            <h3 id="mode-title">Mode: Single Player</h3>
+            <button class="fd-btn" id="select-game-mode" onclick="toggleMode()">Mode</button>
+            <button class="fd-btn" id="start-game">Start</button>
         </div>
         <div class="game-container" id="game-container">
             <div class="modal" id="settings-modal">
@@ -30,6 +31,9 @@
                     <div class="content-body">
                         <label for="ball-color">Ball color:</label>
                         <input class="jscolor" name="ball-color" id="ball-color" value="4CFFA4" title="Pick color">
+                    </div>
+                    <div class="content-body">
+                        <button class="fd-btn content-btn" id="modal-back-to-menu">Back to menu</button>
                     </div>
                 </div>
             </div>
