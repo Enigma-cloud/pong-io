@@ -8,12 +8,13 @@ const canvasPosition = screenHeight / 2 - height / 2;
 const isMobile = window.matchMedia('(max-width: 700px)');
 // Screens
 const startScreenEl = document.getElementById('start-screen');
-const startGameBtn = document.getElementById('start-game');
+const playGameBtn = document.getElementById('play-game');
 const modeBtn = document.getElementById('select-game-mode');
 const modeTitle = document.getElementById('mode-title');
 const gameContainer = document.getElementById('game-container');
 const gameOverEl = document.createElement('div');
 // Menu
+const startGameBtn = document.getElementById('start-game');
 const menuBar = document.getElementById('menu');
 const settingsModal = document.getElementById('settings-modal');
 const settingsBtn = document.getElementById('settings-btn');
@@ -25,6 +26,7 @@ const modalBackToMenu = document.getElementById('modal-back-to-menu');
 const paddleHeight = 50;
 const paddleWidth = 10;
 const paddleDiff = 25;
+const playerSpeed = 4;
 let paddleRightY = (height/2) - paddleDiff;
 let paddleLeftY = 225;
 let playerMoved = false;
@@ -35,7 +37,7 @@ const controller = {
   "s": {pressed: false,
       func: () => {
         playerMoved = true;
-        paddleLeftY += 5;
+        paddleLeftY += playerSpeed;
         if (paddleLeftY > height - paddleHeight) {
           paddleLeftY = height - paddleHeight;
         }
@@ -44,31 +46,31 @@ const controller = {
   "w": {pressed: false,
       func: () => {
         playerMoved = true;
-        paddleLeftY -= 5;
+        paddleLeftY -= playerSpeed;
         if (paddleLeftY < 0) {
           paddleLeftY = 0;
         }
       }
-     },
+    },
   "ArrowDown": {pressed: false,
       func: () => {
         playerMoved = true;
-        paddleRightY += 5;
+        paddleRightY += playerSpeed;
         if (paddleRightY > height - paddleHeight) {
           paddleRightY = height - paddleHeight;
+        }
       }
-    }
-  },
+    },
   "ArrowUp": {pressed: false,
       func: () => {
         playerMoved = true;
-        paddleRightY -= 5;
+        paddleRightY -= playerSpeed;
         if (paddleRightY < 0) {
           paddleRightY = 0;
       }
     }
   }
-}
+};
 
 // Ball
 let ballX = width/2;
@@ -97,9 +99,10 @@ if (isMobile.matches) {
 // Score
 let playerTwo = 0;
 let playerOne = 0;
-const winningScore = 1;
+const winningScore = 10;
 let isGameOver = true;
 let isNewGame = true;
+let isPaused = false;
 // Game Mode
 let isMultiplayer = false;
 let restrictMouse = false;
@@ -153,7 +156,7 @@ function createCanvas() {
 
 // Reset Ball to Center
 function ballReset() {
-  speedX = (-speedX) / 1.5;
+  isMultiplayer ? speedX = (-speedX) / 1.20 : speedX = (-speedX) / 1.10
   ballX = width / 2;
   ballY = height / 2;
   paddleContact = false;
@@ -179,7 +182,7 @@ function ballBoundaries() {
   if (ballY < 0 && speedY < 0) {
     speedY = -speedY;
   }
-  // Bounce off player paddle (Left)
+  // Bounce off player 1 paddle (Left)
   if (ballX > width - paddleDiff) {
     if (ballY > paddleRightY && ballY < paddleRightY + paddleHeight) {
       paddleContact = true;
@@ -196,13 +199,13 @@ function ballBoundaries() {
       trajectoryY = ballY - (paddleRightY + paddleDiff);
       speedY = trajectoryY * 0.3;
     } else if (ballX > width) {
-      // Reset Ball, add to Player One score
+      // Reset Ball, add to player 1 score
       ballReset();
       playerOne++;
       
     }
   }
-  // Bounce off computer paddle (Right)
+  // Bounce off player 2 paddle (Right)
   if (ballX < paddleDiff) {
     if (ballY > paddleLeftY && ballY < paddleLeftY + paddleHeight) {
       // Add Speed on Hit
@@ -278,6 +281,7 @@ function showStartScreen() {
 function toggleSettings() {
   if (settingsModal.style.display !== 'none') {
     settingsModal.style.display = 'none';
+    return
   }
   else {
     settingsModal.style.display = 'flex';
@@ -302,9 +306,10 @@ function showGameOverEl(winner) {
   // Button
   const playAgainBtn = document.createElement('button');
   const backToMenuBtn = document.createElement('button');
-
+  playAgainBtn.classList.add('fd-btn');
   playAgainBtn.setAttribute('onclick', 'startGame()');
   playAgainBtn.textContent = 'Play Again';
+  backToMenuBtn.classList.add('fd-btn');
   backToMenuBtn.setAttribute('onclick', 'showStartScreen()')
   backToMenuBtn.textContent = 'Back to Menu'
   // Append
@@ -335,21 +340,12 @@ function animate() {
   renderCanvas();
   ballMove();
   ballBoundaries();
-
-  if (isMultiplayer) {
-    executeMoves();
-  }
-  else {
-    computerAI();
-  }
-
+  isMultiplayer ? executeMoves() : computerAI()
   gameOver();
   if (!isGameOver && !isPaused) {
     window.requestAnimationFrame(animate);
   } 
 }
-
-let isPaused = false;
 
 // Reset variables
 function resetGame() {
@@ -363,19 +359,34 @@ function resetGame() {
   settingsModal.style.display = 'none';
 }
 
-// Start Game, Reset Everything
-function startGame() {
+// Game Screen
+function showMainGameScreen() {
   startScreenEl.style.display = 'none';
   gameContainer.contains(gameOverEl) ? gameContainer.removeChild(gameOverEl) : '';
-  menuBar.style.display = 'flex';
   canvas.hidden = false;
+}
 
+const tipsModal = document.getElementById('tips-modal');
+
+// Tips Screen
+function toggleTips() {
+  if (tipsModal.style.display === 'flex') {
+    tipsModal.style.display = 'none';
+    return
+  }
+  tipsModal.style.display = 'flex';
+}
+
+// Start Game, Reset Everything
+function startGame() {
+  menuBar.style.display = 'flex';
+  
   resetGame();
   ballReset();
   createCanvas();
   animate();
 
-  if (isMultiplayer) {
+  if (isMultiplayer && restrictMouse) {
     // Multiplayer - Movement Handlers
     document.addEventListener('keydown', (e) => {
       playerMoved = true;
@@ -388,10 +399,6 @@ function startGame() {
         controller[e.key].pressed = false;
       }
     });
-    // Remove Mouse Movement
-    if (restrictMouse) {
-      canvas.removeEventListener('mousemove', (e) => mouseMovement(e));
-    }
   }
   else {
     // Single Player - Mouse Movement
@@ -404,7 +411,15 @@ function startGame() {
 modalBackToMenu.addEventListener('click', showStartScreen);
 ballColorBtn.addEventListener('change', createCanvas);
 settingsBtn.addEventListener('click', toggleSettings);
-startGameBtn.addEventListener('click', startGame);
+playGameBtn.addEventListener('click', () => {
+  showMainGameScreen();
+  toggleSettings();
+  toggleTips();
+});
+startGameBtn.addEventListener('click', () => {
+  toggleTips();
+  startGame();
+});
 window.addEventListener('click', (e) => {
   if (e.target === settingsModal) {
     toggleSettings();

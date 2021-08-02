@@ -4,31 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pong</title>
-    <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.min.css"/>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="main-container" id="main-container">
         <div class="menu-bar" id="menu">
-            <h1>Pong</h1>
+            <h1 class="menu-bar-title">Pong</h1>
             <div class="btn-container">            
                 <i class="fas fa-cog" id="settings-btn" title="Settings"></i>
             </div>
         </div>
         <div class="screen-container" id="start-screen">
-            <h1 class="screen-title">Pong</h1>
-            <h3 id="mode-title">Mode: Single Player</h3>
-            <button class="fd-btn" id="select-game-mode" onclick="toggleMode()">Mode</button>
-            <button class="fd-btn" id="start-game">Start</button>
+            <div class="start-body">
+                <h1 class="screen-title">Pong</h1>
+                <h3 id="mode-title">Mode: Single Player</h3>
+            </div>
+            <div class="start-body">
+                <button class="fd-btn" id="select-game-mode" onclick="toggleMode()">Mode</button>
+                <button class="fd-btn" id="play-game">Play</button>
+            </div>
         </div>
         <div class="game-container" id="game-container">
+            <div class="modal" id="tips-modal">
+                <div class="modal-content">
+                    <div class="content-header">
+                        <h1 class="menu-bar-title">Tips</h1>
+                    </div>
+                    <div class="content-body">
+                        <h4>Win Condition: </h4>
+                        <p>First to 10 points</p>
+                    </div>
+                    <div class="content-body">
+                        <button class="fd-btn content-btn" id="start-game">Start Game</button>
+                    </div>
+                </div>
+            </div>
             <div class="modal" id="settings-modal">
                 <div class="modal-content">
                     <div class="content-header">
-                        <h1>Settings</h1>
+                        <h1 class="menu-bar-title">Settings</h1>
                     </div>
-                    <div class="content-body">
+                    <div class="content-body" id="settings-form">
                         <label for="ball-color">Ball color:</label>
                         <input class="jscolor" name="ball-color" id="ball-color" value="4CFFA4" title="Pick color">
                     </div>

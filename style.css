@@ -1,6 +1,7 @@
 /* Credit goes Federico Dossena for the 'fd-btn' stlye */
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 :root {
   --game-width: 800px;
@@ -13,7 +14,7 @@ body {
   background-color: rgb(39, 39, 39);
   display: flex;
   justify-content: center;
-  font-family: "Courier New", Courier, monospace;
+  font-family: "Roboto", Courier, monospace;
 }
 
 canvas {
@@ -21,9 +22,20 @@ canvas {
   z-index: 9;
 }
 
-h1 {
-  margin: 0;
-  padding: 0;
+h1, h2, h3, h4 {
+  font-family: 'Press Start 2P';
+  margin: 10px;
+  padding: 5px;
+}
+
+p {
+  text-align: center;
+  margin: 5px;
+  padding: 10px;
+}
+
+label {
+  margin-right: 10px;
 }
 
 input {
@@ -66,20 +78,28 @@ input {
   font-weight: bold;
 }
 
+.start-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 10px;
+}
+
 .menu-bar { 
   z-index: 11;
   width: 100%;
   display: none;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0px 10px 0px;
   background-color: rgb(56, 56, 56);
   border-radius: 3px 3px 0px 0px;
 }
 
-.menu-bar h1 {
+.menu-bar-title {
   color: whitesmoke;
-  padding-left: 10px;
+  margin-left: 15px;
+  font-size: 20px;
 }
 
 .btn-container {
@@ -90,6 +110,7 @@ input {
 }
 
 /* Modal */
+
 .modal {
   display: none;
   position: fixed;
@@ -120,7 +141,6 @@ input {
   align-items: center;
   flex-direction: column;
   width: 300px;
-  height: fit-content;
   background-color: rgba(56, 56, 56, 1);
   border-radius: 5px;
   margin: auto;
@@ -144,12 +164,15 @@ input {
   background-color: rgba(100, 100, 100);
   color: whitesmoke;
   font-size: 13px;
-  padding: 5px 0px 5px 0px;
 }
 
 .content-header h1 {
   display: flex;
   align-items: center;
+}
+
+#settings-form {
+  flex-direction: row;
 }
 
 .content-body {
