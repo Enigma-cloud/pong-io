@@ -100,7 +100,7 @@ if (isMobile.matches) {
 // Score
 let playerTwo = 0;
 let playerOne = 0;
-const winningScore = 1;
+const winningScore = 10;
 let isGameOver = true;
 let isNewGame = true;
 let isPaused = false;
