@@ -13,6 +13,7 @@ const modeBtn = document.getElementById('select-game-mode');
 const modeTitle = document.getElementById('mode-title');
 const gameContainer = document.getElementById('game-container');
 const gameOverEl = document.createElement('div');
+const tipsModal = document.getElementById('tips-modal');
 // Menu
 const startGameBtn = document.getElementById('start-game');
 const menuBar = document.getElementById('menu');
@@ -99,13 +100,12 @@ if (isMobile.matches) {
 // Score
 let playerTwo = 0;
 let playerOne = 0;
-const winningScore = 10;
+const winningScore = 1;
 let isGameOver = true;
 let isNewGame = true;
 let isPaused = false;
 // Game Mode
 let isMultiplayer = false;
-let restrictMouse = false;
 
 
 /** Functions */
@@ -229,8 +229,6 @@ function ballBoundaries() {
 // Toggle Game Mode
 function toggleMode() {
   isMultiplayer = !isMultiplayer;
-  restrictMouse = !restrictMouse;
-  console.log(restrictMouse);
   modeTitle.textContent = `Mode: ${isMultiplayer ? 'Multiplayer' : 'Single Player'}`;
 }
 
@@ -307,7 +305,10 @@ function showGameOverEl(winner) {
   const playAgainBtn = document.createElement('button');
   const backToMenuBtn = document.createElement('button');
   playAgainBtn.classList.add('fd-btn');
-  playAgainBtn.setAttribute('onclick', 'startGame()');
+  playAgainBtn.addEventListener('click', () => {
+    showMainGameScreen();
+    startGame();
+  })
   playAgainBtn.textContent = 'Play Again';
   backToMenuBtn.classList.add('fd-btn');
   backToMenuBtn.setAttribute('onclick', 'showStartScreen()')
@@ -355,18 +356,19 @@ function resetGame() {
   isPaused = false;
   playerTwo = 0;
   playerOne = 0;
-  // Reset Modal
+  // Reset Modals
   settingsModal.style.display = 'none';
+  tipsModal.style.display = 'none';
 }
 
 // Game Screen
 function showMainGameScreen() {
   startScreenEl.style.display = 'none';
+  menuBar.style.display = 'flex';
   gameContainer.contains(gameOverEl) ? gameContainer.removeChild(gameOverEl) : '';
   canvas.hidden = false;
+  
 }
-
-const tipsModal = document.getElementById('tips-modal');
 
 // Tips Screen
 function toggleTips() {
@@ -379,14 +381,12 @@ function toggleTips() {
 
 // Start Game, Reset Everything
 function startGame() {
-  menuBar.style.display = 'flex';
-  
   resetGame();
   ballReset();
   createCanvas();
   animate();
 
-  if (isMultiplayer && restrictMouse) {
+  if (isMultiplayer) {
     // Multiplayer - Movement Handlers
     document.addEventListener('keydown', (e) => {
       playerMoved = true;
@@ -412,12 +412,11 @@ modalBackToMenu.addEventListener('click', showStartScreen);
 ballColorBtn.addEventListener('change', createCanvas);
 settingsBtn.addEventListener('click', toggleSettings);
 playGameBtn.addEventListener('click', () => {
-  showMainGameScreen();
-  toggleSettings();
+  startScreenEl.style.display = 'none';
   toggleTips();
 });
 startGameBtn.addEventListener('click', () => {
-  toggleTips();
+  showMainGameScreen();
   startGame();
 });
 window.addEventListener('click', (e) => {
